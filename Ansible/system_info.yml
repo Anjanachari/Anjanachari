@@ -1,0 +1,249 @@
+# 1. Setting Up Nginx Web Server on Multiple Servers
+---
+- name: Setup Nginx Web Server
+  hosts: web_servers
+  become: yes
+  tasks:
+  - name: Install Nginx package
+    apt:
+      name: nginx
+      state: present
+      update_cache: yes
+
+  - name: Start Nginx service
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+
+  - name: Ensure Nginx is running
+    command: curl -I http://localhost
+    register: result
+    failed_when: result.rc != 0
+    changed_when: false
+
+# 2. Deploying a Web Application to Multiple Servers
+---
+- name: Deploy Web Application
+  hosts: app_servers
+  become: yes
+  tasks:
+  - name: Install Git
+    apt:
+      name: git
+      state: present
+
+  - name: Clone the application repository
+    git:
+      repo: 'https://github.com/yourrepo/webapp.git'
+      dest: /var/www/webapp
+      version: master
+
+  - name: Install dependencies (assuming Python)
+    pip:
+      requirements: /var/www/webapp/requirements.txt
+      state: present
+
+  - name: Start the application
+    command: python /var/www/webapp/app.py
+    async: 60
+    poll: 0
+
+# 3. Configuring a Database Server (MySQL)
+---
+- name: Install and Configure MySQL
+  hosts: db_servers
+  become: yes
+  vars:
+    mysql_root_password: "rootpassword"
+    mysql_db: "webapp_db"
+    mysql_user: "appuser"
+    mysql_password: "apppassword"
+
+  tasks:
+  - name: Install MySQL Server
+    apt:
+      name: mysql-server
+      state: present
+
+  - name: Ensure MySQL is started
+    service:
+      name: mysql
+      state: started
+      enabled: yes
+
+  - name: Set the MySQL root password
+    mysql_user:
+      name: root
+      password: "{{ mysql_root_password }}"
+      host: localhost
+      state: present
+
+  - name: Create a database for the application
+    mysql_db:
+      name: "{{ mysql_db }}"
+      state: present
+
+  - name: Create a user for the application
+    mysql_user:
+      name: "{{ mysql_user }}"
+      password: "{{ mysql_password }}"
+      priv: "{{ mysql_db }}.*:ALL"
+      state: present
+      host: '%'
+
+# 4. Automating Infrastructure Setup with Docker Containers
+---
+- name: Install Docker and Deploy Container
+  hosts: docker_hosts
+  become: yes
+  tasks:
+  - name: Install Docker
+    apt:
+      name: docker.io
+      state: present
+      update_cache: yes
+
+  - name: Start Docker service
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: Pull Web Application Docker Image
+    docker_image:
+      name: "yourdockeruser/webapp"
+      source: pull
+
+  - name: Run Web Application container
+    docker_container:
+      name: webapp_container
+      image: "yourdockeruser/webapp"
+      state: started
+      restart_policy: always
+      published_ports:
+      - "80:80"
+
+# 5. Monitoring and Alerting for Server Health
+---
+- name: Install collectd for monitoring
+  hosts: monitoring_servers
+  become: yes
+  tasks:
+  - name: Install collectd package
+    apt:
+      name: collectd
+      state: present
+
+  - name: Ensure collectd is started
+    service:
+      name: collectd
+      state: started
+      enabled: yes
+
+  - name: Configure collectd
+    template:
+      src: collectd.conf.j2
+      dest: /etc/collectd/collectd.conf
+    notify:
+    - Restart collectd
+
+  handlers:
+  - name: Restart collectd
+    service:
+      name: collectd
+      state: restarted
+
+# 6. Backup Configuration for a Database
+---
+- name: MySQL Backup
+  hosts: db_servers
+  become: yes
+  vars:
+    mysql_user: "root"
+    mysql_password: "rootpassword"
+    backup_dir: "/backups/mysql"
+    backup_file: "{{ backup_dir }}/mysql_backup_{{ ansible_date_time.iso8601 }}.sql"
+
+  tasks:
+  - name: Create backup directory
+    file:
+      path: "{{ backup_dir }}"
+      state: directory
+      mode: '0755'
+
+  - name: Run MySQL dump to backup database
+    command: >
+      mysqldump -u {{ mysql_user }} -p{{ mysql_password }} --all-databases > {{ backup_file }}
+    creates: "{{ backup_file }}"
+
+# Ansible Playbook for Auto Patching Based on OS Distribution
+---
+- name: Auto Patching for Any Linux Distribution
+  hosts: all
+  become: yes
+  tasks:
+  - name: Gather facts about the system
+    ansible.builtin.setup:
+
+
+  - name: Apply Security Updates on Ubuntu/Debian-based systems
+    apt:
+      update_cache: yes
+      upgrade: dist
+      only_upgrade: yes
+      state: latest
+      autoremove: yes
+      autoclean: yes
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Apply Security Updates on RHEL/CentOS/Fedora-based systems
+    yum:
+      name: "*"
+      state: latest
+      security: yes
+      update_cache: yes
+    when: ansible_facts['os_family'] == 'RedHat'
+
+  - name: Apply Security Updates on Fedora (dnf-based)
+    dnf:
+      name: "*"
+      state: latest
+      security: yes
+      update_cache: yes
+    when: ansible_facts['distribution'] == 'Fedora'
+
+  - name: Full System Upgrade on Ubuntu/Debian-based systems
+    apt:
+      update_cache: yes
+      upgrade: yes
+      state: latest
+      autoremove: yes
+      autoclean: yes
+    when: ansible_facts['os_family'] == 'Debian'
+
+  - name: Full System Upgrade on RHEL/CentOS-based systems
+    yum:
+      name: "*"
+      state: latest
+      update_cache: yes
+    when: ansible_facts['os_family'] == 'RedHat'
+
+  - name: Full System Upgrade on Fedora (dnf-based)
+    dnf:
+      name: "*"
+      state: latest
+      update_cache: yes
+    when: ansible_facts['distribution'] == 'Fedora'
+
+  - name: Reboot server if needed (Debian/Ubuntu)
+    reboot:
+      msg: "Rebooting after patching"
+      reboot_timeout: 600
+    when: ansible_facts['os_family'] == 'Debian' and ansible_facts['reboot_required'] == True
+
+  - name: Reboot server if needed (RHEL/CentOS/Fedora)
+    reboot:
+      msg: "Rebooting after patching"
+      reboot_timeout: 600
+    when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['reboot_required'] == True

@@ -1,0 +1,139 @@
+# Namespace for Isolation
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-namespace # Namespace to isolate resources for nginx application
+---
+# ConfigMap Example: Stores configuration data that can be used by Pods
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config # Name of the ConfigMap
+  namespace: nginx-namespace # ConfigMap belongs to nginx-namespace
+data:
+  APP_MODE: "production" # Application mode: production
+  LOG_LEVEL: "debug" # Logging level: debug
+---
+# Secret Example: Stores sensitive data, here used for a DB password
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nginx-secret # Name of the Secret
+  namespace: nginx-namespace # Secret belongs to nginx-namespace
+type: Opaque # Default secret type for arbitrary user data
+data:
+  DB_PASSWORD: cGFzc3dvcmQxMjM= # Base64 encoded password 'password123'
+---
+# PersistentVolume (PV) Example: Defines storage available for the application
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv # Name of the Persistent Volume
+  namespace: nginx-namespace # PV belongs to nginx-namespace
+spec:
+  capacity:
+    storage: 1Gi # Storage capacity of 1 GiB
+  accessModes:
+  - ReadWriteOnce # Access mode: Read/Write by a single node
+  persistentVolumeReclaimPolicy: Retain # Do not delete PV when PVC is deleted
+  hostPath:
+    path: "/mnt/data" # Location of the data on the host machine
+---
+# PersistentVolumeClaim (PVC) Example: Requests storage from a PV
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc # Name of the PersistentVolumeClaim
+  namespace: nginx-namespace # PVC belongs to nginx-namespace
+spec:
+  accessModes:
+  - ReadWriteOnce # PVC will request storage with Read/Write access by a single node
+  resources:
+    requests:
+      storage: 1Gi # Request 1 GiB of storage
+---
+# DeploymentConfig Example: Defines nginx application with three replicas (OpenShift specific)
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: nginx-deployment # Name of the DeploymentConfig
+  namespace: nginx-namespace # DeploymentConfig belongs to nginx-namespace
+spec:
+  replicas: 3 # Number of nginx replicas to run
+  selector:
+    app: nginx # Label selector to match Pods with 'app: nginx'
+  template:
+    metadata:
+      labels:
+        app: nginx # Label for Pods
+    spec:
+      containers:
+      - name: nginx # Container name
+        image: nginx:latest # Using the latest nginx image
+        ports:
+        - containerPort: 80 # Expose port 80 on the container
+        envFrom:
+        - configMapRef:
+            name: nginx-config # Use values from nginx-config ConfigMap
+        - secretRef:
+            name: nginx-secret # Use values from nginx-secret Secret
+        volumeMounts:
+        - name: nginx-volume # Mounting the PersistentVolume to the container
+          mountPath: /usr/share/nginx/html # Path inside the container where volume is mounted
+      volumes:
+      - name: nginx-volume
+        persistentVolumeClaim:
+          claimName: nginx-pvc # Use the nginx-pvc PersistentVolumeClaim
+---
+# Horizontal Pod Autoscaler Example: Automatically adjusts the number of replicas based on CPU usage (OpenShift supports HPA)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa # Name of the Horizontal Pod Autoscaler
+  namespace: nginx-namespace # HPA belongs to nginx-namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: nginx-deployment # Target the nginx-deployment
+  minReplicas: 2 # Minimum number of replicas
+  maxReplicas: 10 # Maximum number of replicas
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu # Metric based on CPU usage
+      target:
+        type: Utilization
+        averageUtilization: 50 # Target average CPU utilization of 50%
+---
+# Service Example: Exposes the nginx deployment internally or externally
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service # Name of the Service
+  namespace: nginx-namespace # Service belongs to nginx-namespace
+spec:
+  selector:
+    app: nginx # Select Pods with label 'app: nginx'
+  ports:
+  - protocol: TCP # TCP protocol for communication
+    port: 80 # Service port
+    targetPort: 80 # Port on the container to forward traffic to
+  type: ClusterIP # Internal service by default (can change to LoadBalancer if using OpenShift cloud provider)
+---
+# Route Example: Exposes the nginx service externally via OpenShift Route (instead of Ingress in Kubernetes)
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nginx-route # Name of the Route
+  namespace: nginx-namespace # Route belongs to nginx-namespace
+spec:
+  host: nginx.example.com # The hostname where the service will be accessible externally
+  to:
+    kind: Service
+    name: nginx-service # Points to the nginx-service for routing traffic
+  port:
+    targetPort: 80 # Forward traffic to port 80 of the nginx-service
+  tls:
+    termination: edge # TLS termination (can be 'edge', 'passthrough', or 'reencrypt')

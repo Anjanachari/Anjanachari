@@ -1,0 +1,58 @@
+---
+- name: Install and Start Nginx Locally
+  hosts: localhost
+  become: yes # Run as sudo
+  connection: local
+
+  tasks:
+  - name: Install Nginx (Debian-based)
+    apt:
+      name: nginx
+      state: present
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Install Nginx (RHEL-based)
+    yum:
+      name: nginx
+      state: present
+    when: ansible_os_family == "RedHat"
+
+  - name: Start and Enable Nginx Service
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+
+
+
+
+# ---
+# - name: Uninstall Nginx Locally
+#   hosts: localhost
+#   become: yes  # Run as sudo
+#   connection: local
+# 
+#   tasks:
+#     - name: Remove Nginx (Debian-based)
+#       apt:
+#         name: nginx
+#         state: absent
+#         purge: yes
+#         autoremove: yes
+#       when: ansible_os_family == "Debian"
+# 
+#     - name: Remove Nginx (RHEL-based)
+#       yum:
+#         name: nginx
+#         state: absent
+#       when: ansible_os_family == "RedHat"
+# 
+#     - name: Remove leftover configuration files
+#       file:
+#         path: "{{ item }}"
+#         state: absent
+#       loop:
+#         - /etc/nginx
+#         - /var/log/nginx
+#         - /var/lib/nginx

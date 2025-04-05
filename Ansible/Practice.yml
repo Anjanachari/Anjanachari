@@ -1,0 +1,29 @@
+---
+- name: List files using ls -lrt and save to a file
+  hosts: localhost
+  tasks:
+    - name: Run ls -lrt and save output to file
+      command: ls -lrt
+      register: ls_output
+    - name: Save ls -lrt output to a file
+      copy:
+        content: "{{ ls_output.stdout }}"
+        dest: "./file_list.txt"
+    - name: Save df database
+      command: df -h
+      register: df_output
+    - name: saving in file 
+      blockinfile:
+        block: "{{df_output.stdout}}"
+        path: "./file_list1.txt"
+        insertafter: EOF
+        create: yes
+    - name: save info of du
+      command: du -l /mnt/c/Users/anjan/OneDrive/Learning/
+      register: du_output
+    - name: save info of du -l
+      blockinfile:
+        block: "{{du_output.stdout}}"
+        path: "./file_list2.txt"
+        insertafter: EOF
+        create: yes

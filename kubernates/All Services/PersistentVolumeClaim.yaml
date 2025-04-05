@@ -1,0 +1,12 @@
+# PersistentVolumeClaim (PVC) Example: Requests storage from a PV
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc # Name of the PersistentVolumeClaim
+  namespace: nginx-namespace # PVC belongs to nginx-namespace
+spec:
+  accessModes:
+  - ReadWriteOnce # PVC will request storage with Read/Write access by a single node
+  resources:
+    requests:
+      storage: 1Gi # Request 1 GiB of storage

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-project
+  labels:
+    app: sample-project
+spec:
+  replicas: 2
+  selector:
+    matchLabel:
+      app: sample-project
+  templete:
+    metadata:
+      labels:
+        app: sample-project
+    spec:
+      container:
+      - name: sample-project
+        image: anjana/image11
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: sample-project-svc
+spec:
+  selector:
+    app: sample-project

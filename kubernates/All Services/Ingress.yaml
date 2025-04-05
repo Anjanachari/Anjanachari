@@ -1,0 +1,20 @@
+# Ingress Example: Exposes the nginx service externally through a specific domain
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress # Name of the Ingress resource
+  namespace: nginx-namespace # Ingress belongs to nginx-namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: / # Path rewriting rule for the ingress
+spec:
+  rules:
+  - host: nginx.example.com # The hostname where the service will be accessible
+    http:
+      paths:
+      - path: / # URL path to match
+        pathType: Prefix # Match all paths that start with '/'
+        backend:
+          service:
+            name: nginx-service # Redirect traffic to nginx-service
+            port:
+              number: 80 # Forward traffic to port 80 of nginx-service

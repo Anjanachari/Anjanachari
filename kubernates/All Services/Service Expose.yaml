@@ -1,0 +1,14 @@
+# Service Example: Exposes the nginx deployment internally or externally
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service # Name of the Service
+  namespace: nginx-namespace # Service belongs to nginx-namespace
+spec:
+  selector:
+    app: nginx # Select Pods with label 'app: nginx'
+  ports:
+  - protocol: TCP # TCP protocol for communication
+    port: 80 # Service port
+    targetPort: 80 # Port on the container to forward traffic to
+  type: LoadBalancer # Expose the service externally using a LoadBalancer

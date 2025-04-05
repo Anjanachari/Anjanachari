@@ -1,0 +1,14 @@
+# PersistentVolume (PV) Example: Defines storage available for the application
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv # Name of the Persistent Volume
+  namespace: nginx-namespace # PV belongs to nginx-namespace
+spec:
+  capacity:
+    storage: 1Gi # Storage capacity of 1 GiB
+  accessModes:
+  - ReadWriteOnce # Access mode: Read/Write by a single node
+  persistentVolumeReclaimPolicy: Retain # Do not delete PV when PVC is deleted
+  hostPath:
+    path: "/mnt/data" # Location of the data on the host machine
