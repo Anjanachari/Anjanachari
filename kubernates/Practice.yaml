@@ -53,3 +53,17 @@ spec:
             name: anjana-cm
         - secretRef:
             name: anjana-ss
+        volumeMounts:
+        - name: nginx-volume
+          mountPath: /usr/dhsre/nginx/html
+        resources:
+          requests:
+            memory: "6Mi"
+            cpu: "25m"
+          limits:
+            memory: "12Mi"
+            cpu: "50m"
+      volumes:
+      - name: nginx-volume
+        persistentVolumeClaim:
+          claimName: anjana-pvc

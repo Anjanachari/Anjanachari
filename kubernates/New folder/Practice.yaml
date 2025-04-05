@@ -28,36 +28,6 @@ data:
 #  tls.cert: ""
 #  tls.key: ""
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: anjana-pv
-  namespace: anjana-ns
-spec:
-  capacity:
-    storage: 1Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: hostpath-storage
-  hostPath:
-    path: "/mnt/data"
-    type: Directory
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: anjana-pvc
-  namespace: anjana-ns
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: hostpath-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -83,17 +53,3 @@ spec:
             name: anjana-cm
         - secretRef:
             name: anjana-ss
-        volumeMounts:
-        - name: nginx-volume
-          mountPath: /usr/dhsre/nginx/html
-        resources:
-          requests:
-            memory: "6Mi"
-            cpu: "25m"
-          limits:
-            memory: "12Mi"
-            cpu: "50m"
-      volumes:
-      - name: nginx-volume
-        persistentVolumeClaim:
-          claimName: anjana-pvc
