@@ -34,7 +34,7 @@ metadata:
   name: anjana-nginx-deployment
   namespace: anjana-ns
 spec:
-  replicas: 3
+  replicas: 10
   selector:
     matchLabels:
       app: nginx
