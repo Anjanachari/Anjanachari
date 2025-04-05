@@ -1,0 +1,6 @@
+# Namespace for Isolation
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-namespace # Namespace to isolate resources for nginx application

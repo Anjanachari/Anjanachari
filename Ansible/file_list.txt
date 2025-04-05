@@ -1,0 +1,9 @@
+total 24
+-rwxrwxrwx 1 anjana anjana 5793 Mar 18 17:09 system_info.yml
+-rwxrwxrwx 1 anjana anjana   34 Mar 19 05:26 ansible.cfg
+-rwxrwxrwx 1 anjana anjana 1248 Mar 19 05:31 Nginx.yml
+-rwxrwxrwx 1 anjana anjana 1859 Mar 19 06:22 mysql.yml
+-rwxrwxrwx 1 anjana anjana  503 Mar 19 09:37 file_list2.txt
+-rwxrwxrwx 1 anjana anjana  856 Mar 19 11:07 Practice.yml
+-rwxrwxrwx 1 anjana anjana  473 Mar 19 11:08 file_list.txt
+-rwxrwxrwx 1 anjana anjana  892 Mar 19 11:08 file_list1.txt

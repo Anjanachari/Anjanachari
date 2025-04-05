@@ -1,0 +1,99 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: anjana-ns
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anjana-cm
+  namespace: anjana-ns
+data:
+  #  db_host: ""
+  #  db_name: ""
+  APP_MODE: production
+  LOG_LEVEL: "debug"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: anjana-ss
+  namespace: anjana-ns
+type: Opaque
+data:
+  DB_PASSWORD: cGFzc3dvcmQxMjM=
+
+#  db_user: ""
+#  tls.cert: ""
+#  tls.key: ""
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: anjana-pv
+  namespace: anjana-ns
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath-storage
+  hostPath:
+    path: "/mnt/data"
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: anjana-pvc
+  namespace: anjana-ns
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: hostpath-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anjana-nginx-deployment
+  namespace: anjana-ns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: anjana-cm
+        - secretRef:
+            name: anjana-ss
+        volumeMounts:
+        - name: nginx-volume
+          mountPath: /usr/dhsre/nginx/html
+        resources:
+          requests:
+            memory: "6Mi"
+            cpu: "25m"
+          limits:
+            memory: "12Mi"
+            cpu: "50m"
+      volumes:
+      - name: nginx-volume
+        persistentVolumeClaim:
+          claimName: anjana-pvc

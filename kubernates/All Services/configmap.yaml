@@ -1,0 +1,9 @@
+# ConfigMap Example: Stores configuration data that can be used by Pods
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config # Name of the ConfigMap
+  namespace: nginx-namespace # ConfigMap belongs to nginx-namespace
+data:
+  APP_MODE: "production" # Application mode: production
+  LOG_LEVEL: "debug" # Logging level: debug

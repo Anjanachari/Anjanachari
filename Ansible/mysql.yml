@@ -1,0 +1,69 @@
+---
+- name: Install and Configure MySQL Server
+  hosts: db_servers
+  become: yes
+  gather_facts: yes
+  vars:
+    mysql_root_password: "StrongRootPassword"
+    mysql_user_password: "UserStrongPassword"
+    mysql_database: "my_database"
+    mysql_user: "my_user"
+
+  tasks:
+  - name: Detect OS Family
+    debug:
+      msg: "Running on {{ ansible_os_family }}"
+
+  - name: Install MySQL Server (Debian-based)
+    apt:
+      name: mysql-server
+      state: present
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+  - name: Install MariaDB Server (RHEL-based)
+    yum:
+      name: mariadb-server
+      state: present
+    when: ansible_os_family == "RedHat"
+
+  - name: Start and enable MySQL/MariaDB service
+    service:
+      name: "{{ 'mysql' if ansible_os_family == 'Debian' else 'mariadb' }}"
+      state: started
+      enabled: yes
+
+  - name: Secure MySQL root user
+    mysql_user:
+      name: root
+      password: "{{ mysql_root_password }}"
+      host: localhost
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      priv: "*.*:ALL,GRANT"
+    ignore_errors: yes # Ignore errors in case password is already set
+
+  - name: Create a new MySQL database
+    mysql_db:
+      name: "{{ mysql_database }}"
+      state: present
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+
+  - name: Create a MySQL user
+    mysql_user:
+      name: "{{ mysql_user }}"
+      password: "{{ mysql_user_password }}"
+      priv: "{{ mysql_database }}.*:ALL"
+      host: "%"
+      state: present
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+
+  - name: Allow remote MySQL connections (Debian-based)
+    lineinfile:
+      path: /etc/mysql/mysql.conf.d/mysqld.cnf
+      regexp: '^bind-address'
+      line: 'bind-address = 0.0.0.0'
+    notify: Restart MySQL
+    when: ansible_os_family == "Debian"

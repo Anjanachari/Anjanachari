@@ -1,0 +1,40 @@
+# Deployment Example with ConfigMap and Secret Usage: Defines nginx application with three replicas
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # Name of the Deployment
+  namespace: nginx-namespace # Deployment belongs to nginx-namespace
+spec:
+  replicas: 3 # Number of nginx replicas to run
+  selector:
+    matchLabels:
+      app: nginx # Label selector to match Pods with 'app: nginx'
+  template:
+    metadata:
+      labels:
+        app: nginx # Label for Pods
+    spec:
+      containers:
+      - name: nginx # Container name
+        image: nginx:latest # Using the latest nginx image
+        ports:
+        - containerPort: 80 # Expose port 80 on the container
+        envFrom:
+        - configMapRef:
+            name: nginx-config # Use values from nginx-config ConfigMap
+        - secretRef:
+            name: nginx-secret # Use values from nginx-secret Secret
+        volumeMounts:
+        - name: nginx-volume # Mounting the PersistentVolume to the container
+          mountPath: /usr/share/nginx/html # Path inside the container where volume is mounted
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      volumes:
+      - name: nginx-volume
+        persistentVolumeClaim:
+          claimName: nginx-pvc # Use the nginx-pvc PersistentVolumeClaim
