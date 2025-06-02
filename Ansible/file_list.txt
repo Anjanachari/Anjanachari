@@ -1,9 +1,128 @@
-total 24
--rwxrwxrwx 1 anjana anjana 5793 Mar 18 17:09 system_info.yml
--rwxrwxrwx 1 anjana anjana   34 Mar 19 05:26 ansible.cfg
--rwxrwxrwx 1 anjana anjana 1248 Mar 19 05:31 Nginx.yml
--rwxrwxrwx 1 anjana anjana 1859 Mar 19 06:22 mysql.yml
--rwxrwxrwx 1 anjana anjana  503 Mar 19 09:37 file_list2.txt
--rwxrwxrwx 1 anjana anjana  856 Mar 19 11:07 Practice.yml
--rwxrwxrwx 1 anjana anjana  473 Mar 19 11:08 file_list.txt
--rwxrwxrwx 1 anjana anjana  892 Mar 19 11:08 file_list1.txt
+### File listing and system info
+# BEGIN ANSIBLE MANAGED BLOCK
+### Output of du -l on Learning folder
+45	/mnt/c/Users/anjan/OneDrive/Learning/.git/hooks
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/info
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/logs/refs/heads
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/logs/refs/remotes/origin
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/logs/refs/remotes
+8	/mnt/c/Users/anjan/OneDrive/Learning/.git/logs/refs
+12	/mnt/c/Users/anjan/OneDrive/Learning/.git/logs
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/00
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/07
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/0a
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/0c
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/0e
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/14
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/1c
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/1e
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/20
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/2c
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/36
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/39
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/3a
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/3d
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/41
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/43
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/44
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/46
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/4b
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/4e
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/50
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/59
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/5d
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/66
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/69
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/6a
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/6e
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/6f
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/77
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/7a
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/7d
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/7f
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/80
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/84
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/87
+1	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/88
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/8d
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/8f
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/92
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/95
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/96
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/9c
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/9f
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/a0
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/a3
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/a6
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/a8
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/ac
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/b9
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/c9
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/ca
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/d1
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/d4
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/d5
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/d9
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/e0
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/e3
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/e6
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/e8
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/eb
+4	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/ec
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/f4
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/f6
+216	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/ff
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/info
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects/pack
+277	/mnt/c/Users/anjan/OneDrive/Learning/.git/objects
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/refs/heads
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/refs/remotes/origin
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/refs/remotes
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/refs/tags
+0	/mnt/c/Users/anjan/OneDrive/Learning/.git/refs
+342	/mnt/c/Users/anjan/OneDrive/Learning/.git
+0	/mnt/c/Users/anjan/OneDrive/Learning/.vscode
+21	/mnt/c/Users/anjan/OneDrive/Learning/Ansible
+12	/mnt/c/Users/anjan/OneDrive/Learning/Docker
+45	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/hooks
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/info
+5	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/logs/refs/heads
+4	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/logs/refs/remotes/origin
+4	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/logs/refs/remotes
+9	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/logs/refs
+13	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/logs
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/01
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/08
+4	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/11
+4	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/1e
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/25
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/3f
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/4b
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/63
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/96
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/a0
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/c6
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/cd
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/d8
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/df
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/e4
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/e6
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/fc
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/info
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects/pack
+8	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/objects
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/refs/heads
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/refs/remotes/origin
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/refs/remotes
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/refs/tags
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git/refs
+70	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/.git
+0	/mnt/c/Users/anjan/OneDrive/Learning/git_practice/git_git
+70	/mnt/c/Users/anjan/OneDrive/Learning/git_practice
+29	/mnt/c/Users/anjan/OneDrive/Learning/jenkins
+14	/mnt/c/Users/anjan/OneDrive/Learning/kubernates/All Services
+4	/mnt/c/Users/anjan/OneDrive/Learning/kubernates/New folder
+43	/mnt/c/Users/anjan/OneDrive/Learning/kubernates
+8	/mnt/c/Users/anjan/OneDrive/Learning/Openshift
+185542	/mnt/c/Users/anjan/OneDrive/Learning/
+# END ANSIBLE MANAGED BLOCK

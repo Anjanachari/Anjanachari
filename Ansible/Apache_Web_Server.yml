@@ -1,0 +1,35 @@
+---
+- name: Install and Configure Apache Web Server
+  hosts: localhost
+  become: yes
+
+  tasks:
+  - name: Install Apache
+    apt:
+      name: apache2
+      state: present
+      update_cache: yes
+
+  - name: Ensure Apache service is running and enabled
+    service:
+      name: apache2
+      state: started
+      enabled: yes
+
+  - name: Deploy index.html file
+    copy:
+      content: "<h1>Welcome to My Apache </h1>"
+      dest: /var/www/html/index.html
+      mode: '0644'
+
+  - name: Allow HTTP traffic in firewall
+    ufw:
+      rule: allow
+      port: '80'
+      proto: tcp
+#  - name: UnInstall Apache
+#    apt:
+#      name: apache2
+#      state: absent
+#      update_cache: yes
+#      purge: yes

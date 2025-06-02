@@ -2,28 +2,72 @@
 - name: List files using ls -lrt and save to a file
   hosts: localhost
   tasks:
-    - name: Run ls -lrt and save output to file
-      command: ls -lrt
-      register: ls_output
-    - name: Save ls -lrt output to a file
-      copy:
-        content: "{{ ls_output.stdout }}"
-        dest: "./file_list.txt"
-    - name: Save df database
-      command: df -h
-      register: df_output
-    - name: saving in file 
-      blockinfile:
-        block: "{{df_output.stdout}}"
-        path: "./file_list1.txt"
-        insertafter: EOF
-        create: yes
-    - name: save info of du
-      command: du -l /mnt/c/Users/anjan/OneDrive/Learning/
-      register: du_output
-    - name: save info of du -l
-      blockinfile:
-        block: "{{du_output.stdout}}"
-        path: "./file_list2.txt"
-        insertafter: EOF
-        create: yes
+  - name: Run ls -lrt and save output to file
+    command: ls -lrt
+    register: ls_output
+  - name: Save ls -lrt output to a file
+    copy:
+      content: |
+        ### Run ls -lrt and save output
+        {{ ls_output.stdout }}
+      dest: "./file_list.txt"
+  - name: Save df database
+    shell: df -h | awk '{print $1,$5,$6}'
+    register: df_output
+  - name: saving in file
+    blockinfile:
+      block: |
+        ### Run df -h and save output
+        {{ df_output.stdout }}
+      path: "./file_list.txt"
+      insertafter: EOF
+      create: yes
+  - name: save info of du
+    command: du -h /mnt/c/Users/anjan/OneDrive/Learning/ | sort -r | head -10
+    register: du_output
+  - name: save info of du -l
+    blockinfile:
+      block: |
+        ### Run du -l and save output
+        {{ du_output.stdout }}
+      path: "./file_list.txt"
+      insertafter: EOF
+      create: yes
+---
+- name: Get git version and current time
+  hosts: localhost
+  become: yes
+  gather_facts: yes
+
+  tasks:
+  - name: Get git version
+    command: git --version
+    register: git_version
+
+  - name: Save git version and current time to file
+    copy:
+      content: |
+        Git Version: {{ git_version.stdout }}
+        Current Time: {{ ansible_date_time.iso8601 }}
+        Distribution: {{ ansible_distribution }}
+        Memory: {{ ansible_memtotal_mb }} MB
+        CPU Architecture: {{ ansible_architecture }}
+        Mounts: {{ ansible_mounts }}
+      dest: ./gitversion.txt
+
+#  - name: Append git version line to file using lineinfile
+#    lineinfile:
+#      path: "./gitversion.txt"
+#      line: "{{ git_version.stdout }}"
+#      create: yes
+#      insertafter: EOF
+
+#  - name: save git version in file using blockinfile
+#    blockinfile:
+#      path: "./gitversion.txt"
+#      block: |
+#       ### Git Version Info
+#        {{ git_version.stdout }}
+#      create: yes
+#      insertafter: EOF
+#      marker: "# {mark} ANSIBLE MANAGED BLOCK - GIT VERSION"

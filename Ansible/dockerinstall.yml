@@ -1,0 +1,44 @@
+---
+- name: Install Docker and Run Nginx Container
+  hosts: localhost
+  become: yes
+
+  tasks:
+  - name: Install Docker
+    apt:
+      name: docker.io
+      state: present
+      update_cache: yes
+
+  - name: Start Docker service
+    service:
+      name: docker
+      state: started
+      enabled: yes
+  - name: Disable and stop Docker service
+    service:
+      name: docker
+      state: stopped
+      enabled: no
+    tags: Disable
+
+
+
+  - name: Run Nginx container
+    docker_container:
+      name: nginx_container
+      image: nginx:latest
+      state: started
+      ports:
+      - "80:80"
+
+  - name: Stop Nginx container
+    docker_container:
+      name: nginx_container
+      state: stopped
+    tags: stop
+  - name: Remove Nginx container
+    docker_container:
+      name: nginx_container
+      state: absent
+    tags: Remove

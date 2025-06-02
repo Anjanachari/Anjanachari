@@ -1,0 +1,26 @@
+---
+- name: installing packeges
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: installation
+    apt:
+      name:
+        - git
+        - curl
+        - nginx
+        - vim
+      state: present
+  - name: checking
+    service:
+      name: nginx
+      state: started
+  - name: Uninstall
+    apt:
+      name:
+        - vim
+        - curl
+        - nginx
+        - git
+      state: absent
+      purge: yes

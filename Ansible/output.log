@@ -1,0 +1,26 @@
+
+PLAY [Ensure Nginx is installed and running] ***********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Check if nginx is installed] *********************************************
+changed: [localhost]
+
+TASK [Install nginx if not installed] ******************************************
+skipping: [localhost]
+
+TASK [Ensure nginx is started and enabled] *************************************
+ok: [localhost]
+
+TASK [Check nginx status] ******************************************************
+changed: [localhost]
+
+TASK [Display nginx status] ****************************************************
+ok: [localhost] => {
+    "msg": "Nginx service is active"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

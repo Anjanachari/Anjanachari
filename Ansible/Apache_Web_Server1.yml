@@ -1,0 +1,32 @@
+---
+- name: Install and run apache
+  become: yes
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - name: Installation
+      apt:
+        name: apache2
+        state: present
+      tags: Install
+    - name: start
+      service: 
+        name: apache2
+        state: started
+      tags: status
+    - name: content copy
+      copy:
+        content: "<h1>Welcome DevOps World</h1>"
+        dest: /var/www/html/index.html
+      tags: content 
+    - name: port mapping
+      ufw:
+        port: 80
+        proto: tcp
+        rule: allow
+      tags: port
+    - name: uninstallation
+      apt:
+        name: apache2
+        state: absent
+      tags: uninstallgit

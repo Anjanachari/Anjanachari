@@ -1,0 +1,26 @@
+---
+- name: Install and Configure MySQL Server
+  hosts: localhost
+  become: yes
+  vars:
+    mysql_root_password: "StrongPassword"
+
+  tasks:
+  - name: Install MySQL
+    apt:
+      name: mysql-server
+      state: present
+      update_cache: yes
+
+  - name: Ensure MySQL service is running and enabled
+    service:
+      name: mysql
+      state: started
+      enabled: yes
+
+  - name: Secure MySQL root user
+    mysql_user:
+      name: root
+      password: "{{ mysql_root_password }}"
+      host: localhost
+      priv: "*.*:ALL,GRANT"
