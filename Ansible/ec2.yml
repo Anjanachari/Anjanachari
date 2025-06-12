@@ -1,0 +1,29 @@
+---
+- name: Launch an EC2 instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    aws_region: "us-east-1"
+    instance_type: "t2.micro"
+    ami_id: "ami-0c55b159cbfafe1f0"
+    key_name: "my-aws-key"
+    security_group_ids:
+    - "sg-0abc123456789def0" # Replace with your real SG ID
+
+  tasks:
+  - name: Launch EC2 instance
+    amazon.aws.ec2_instance:
+      region: "{{ aws_region }}"
+      key_name: "{{ key_name }}"
+      instance_type: "{{ instance_type }}"
+      image_id: "{{ ami_id }}"
+      wait: yes
+      security_group_ids: "{{ security_group_ids }}"
+      tags:
+        Name: "Ansible-EC2-Instance"
+    register: ec2_instance
+
+  - name: Display instance details
+    debug:
+      msg: "Instance {{ ec2_instance.instances[0].instance_id }} created in AWS"

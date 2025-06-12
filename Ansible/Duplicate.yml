@@ -1,0 +1,18 @@
+- name: Set File Permissions on Directory
+  hosts: all
+  become: yes
+  vars:
+    path: /var/www/myapp       # directory path to set permissions
+    owner: deployuser          # desired owner
+    group: deployuser          # desired group
+    mode: '0755'               # permissions mode
+  tasks:
+    - name: Set ownership and permissions recursively
+      file:
+        path: "{{ path }}"
+        owner: "{{ owner }}"
+        group: "{{ group }}"
+        recurse: yes
+        mode: "{{ mode }}"
+        state: directory
+        
