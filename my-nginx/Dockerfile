@@ -1,10 +1,8 @@
-# Use the official NGINX base image
+# Use the official NGINX image from Docker Hub
 FROM nginx:latest
 
-# Copy custom static files into the default nginx directory
-COPY html/ /usr/share/nginx/html/
+# Copy custom HTML file to replace the default NGINX page
+COPY index.html /usr/share/nginx/html/index.html
 
-# Optional: Expose port (useful for documentation, not mandatory)
+# Expose port 80 for the NGINX service
 EXPOSE 80
-
-# No need to override CMD unless you're modifying NGINX behavior
