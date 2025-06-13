@@ -1,0 +1,61 @@
+provider "aws" {
+  region = "us-west-2"  # Set your region here
+}
+
+# Security Group for HTTP traffic on port 8080
+resource "aws_security_group" "allow_http" {
+  name        = "Anjana_http"
+  description = "Allow HTTP traffic on port 8080"
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# EC2 Instance for Nginx web server
+resource "aws_instance" "web_server" {
+  ami           = "ami-022ce6f32988af5fa"  # Replace with the latest Amazon Linux AMI ID in your region
+  instance_type = "t2.micro"  # You can choose other types if needed
+  key_name      = "Terraform"  # Replace with your SSH key name
+
+  # Associate with the security group
+  security_groups = [aws_security_group.Anjana_http.name]
+
+  # User data to install Nginx and modify the index.html file
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y nginx
+              systemctl start nginx
+              systemctl enable nginx
+              # Modify Nginx to listen on port 8080 instead of 80
+              sed -i 's/listen       80;/listen       8080;/' /etc/nginx/nginx.conf
+              echo "Welcome to My Website - 1" > /usr/share/nginx/html/index.html
+              systemctl restart nginx
+              EOF
+
+  tags = {
+    Name = "NginxWebServer"
+  }
+}
+
+# Output the public IP of the EC2 instance
+output "instance_public_ip" {
+  value = aws_instance.web_server.public_ip
+}

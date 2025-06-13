@@ -1,0 +1,108 @@
+# Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Reference existing VPC
+data "aws_vpc" "existing_vpc" {
+  id = "vpc-xxxxxxxx"  # Replace with the actual VPC ID or leave empty to find an existing VPC dynamically
+}
+
+# Reference existing Subnet
+data "aws_subnet" "existing_subnet" {
+  id = "subnet-xxxxxxxx"  # Replace with actual Subnet ID
+}
+
+# Reference existing Security Group
+data "aws_security_group" "existing_sg" {
+  id = "sg-xxxxxxxx"  # Replace with the actual Security Group ID
+}
+
+# Reference existing Internet Gateway
+data "aws_internet_gateway" "existing_igw" {
+  id = "igw-xxxxxxxx"  # Replace with the actual IGW ID
+}
+
+# Reference existing EC2 Instance
+data "aws_instance" "existing_instance" {
+  instance_id = "i-xxxxxxxx"  # Replace with the actual EC2 instance ID
+}
+
+# VPC: If the VPC doesn't exist, create it
+resource "aws_vpc" "main" {
+  count      = length(data.aws_vpc.existing_vpc.id) > 0 ? 0 : 1
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "MyCustomVPC"
+  }
+}
+
+# Subnet: If the subnet doesn't exist, create it
+resource "aws_subnet" "subnet" {
+  count      = length(data.aws_subnet.existing_subnet.id) > 0 ? 0 : 1
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  tags = {
+    Name = "MyCustomSubnet"
+  }
+}
+
+# Security Group: If the SG doesn't exist, create it
+resource "aws_security_group" "sg1" {
+  count      = length(data.aws_security_group.existing_sg.id) > 0 ? 0 : 1
+  name       = "ansg1"
+  description = "ansg1"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Internet Gateway: If the IGW doesn't exist, create it
+resource "aws_internet_gateway" "gw" {
+  count = length(data.aws_internet_gateway.existing_igw.id) > 0 ? 0 : 1
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "MyCustomInternetGateway"
+  }
+}
+
+# EC2 Instance: If the EC2 instance doesn't exist, create it
+resource "aws_instance" "instance1" {
+  count         = length(data.aws_instance.existing_instance.id) > 0 ? 0 : 1
+  ami           = "ami-071226ecf16aa7d96"
+  instance_type = "t2.micro"
+  security_groups = [aws_security_group.sg1.name]
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo yum update -y
+              sudo yum install -y httpd
+              sudo systemctl start httpd
+              sudo systemctl enable httpd
+              sudo bash -c 'echo "Welcome to My Website - Anjana" > /var/www/html/index.html'
+              EOF
+
+  tags = {
+    Name = "anjan-instance-1"
+  }
+}
+
+# Output: EC2 Instance Public IP
+output "instance_public_ip_anjana" {
+  value = aws_instance.instance1.public_ip
+}

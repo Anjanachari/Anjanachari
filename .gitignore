@@ -1,2 +1,10 @@
 argocd.exe
 Anjana/
+**/.terraform/
+# Terraform-specific
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.crash
+.terraform.lock.hcl
