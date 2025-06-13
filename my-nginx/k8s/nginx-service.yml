@@ -7,6 +7,7 @@ spec:
     app: nginx
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: LoadBalancer
+    port: 80 # Expose port 80
+    targetPort: 80 # Port inside the container
+    nodePort: 30001 # Expose on port 30001 on the node (Minikube VM)
+  type: NodePort # Use NodePort for Minikube
