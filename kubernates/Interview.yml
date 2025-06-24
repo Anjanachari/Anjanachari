@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: anjana-ns
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anjana-cm
+  namespace: anjana-ns
+data:
+  log_level: "debug"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: anjana-se
+  namespace: anjana-ns
+data:
+  db_host: "host"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: anjana-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath-storage
+  hostPath:
+    path: "/mnt/data"
+    type: Directory
+---
+apiVersion: v1
+kind: persistentVolumeClaim
+metadata:
+  name: anjana-pvc
+  namespace: anjana-ns
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: hostpath-storage
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anjana-d
+  namespace: anjana-ns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: anjana-se
+        - configMapRef:
+            name: anjana-cm
+        volumeMounts:
+        - name: anjana-vm
+          path: "/usr/share/nginx/html"
+        resource:
+          requests:
+            cpu: 1Gi
+            memory: "250m"
+          limits:
+            cpu: 1Gi
+            memory: "250m"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name:
+  namespace:
+spec:
+  scaleTargetRef:
+    kind:
+    apiVersion:
+    name:

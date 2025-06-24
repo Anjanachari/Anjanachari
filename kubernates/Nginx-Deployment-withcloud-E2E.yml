@@ -1,9 +1,11 @@
 ---
+# Create a namespace for all nginx-related resources
 apiVersion: v1
 kind: Namespace
 metadata:
   name: nginx-ns
 ---
+# ConfigMap to hold non-sensitive config data (like logging level, DB host)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,8 +13,9 @@ metadata:
   namespace: nginx-ns
 data:
   log_level: debug
-  db_host: 55675vhc
+  db_host: your-rds-endpoint.amazonaws.com # Replace with your actual RDS endpoint
 ---
+# Secret for sensitive info (base64 encoded)
 apiVersion: v1
 kind: Secret
 metadata:
@@ -20,37 +23,24 @@ metadata:
   namespace: nginx-ns
 type: Opaque
 data:
+  # base64 for "password123"
   db_password: cGFzc3dvcmQxMjM=
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nginx-pv
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  persistentVolumeReclaimPolicy: Retain
-  volumeMode: Filesystem
-  storageClassName: host-path
-  hostPath:
-    path: "/mnt/data"
-    type: Directory
----
+# PersistentVolumeClaim using AWS EBS via the default gp2 StorageClass
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nginx-pvc
   namespace: nginx-ns
 spec:
+  accessModes:
+  - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: host-path
+  storageClassName: gp2 # AWS default EBS storage class; adjust if needed
 ---
+# Deployment with 3 nginx replicas, environment variables, volume mount, probes
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -78,19 +68,32 @@ spec:
             name: nginx-ss
         volumeMounts:
         - name: nginx-volume
-          mountPath: "/usr/share/nginx/html"
+          mountPath: /usr/share/nginx/html
         resources:
           requests:
-            memory: 1Gi
-            cpu: 250m
+            memory: 256Mi
+            cpu: 100m
           limits:
-            memory: 2Gi
-            cpu: 500m
+            memory: 512Mi
+            cpu: 250m
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
       volumes:
       - name: nginx-volume
         persistentVolumeClaim:
           claimName: nginx-pvc
 ---
+# Horizontal Pod Autoscaler based on CPU usage between 2 and 10 replicas
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -98,8 +101,8 @@ metadata:
   namespace: nginx-ns
 spec:
   scaleTargetRef:
-    kind: Deployment
     apiVersion: apps/v1
+    kind: Deployment
     name: nginx-deployment
   minReplicas: 2
   maxReplicas: 10
@@ -111,6 +114,7 @@ spec:
         type: Utilization
         averageUtilization: 50
 ---
+# Service exposing nginx pods as NodePort for ALB Ingress to route traffic
 apiVersion: v1
 kind: Service
 metadata:
@@ -121,17 +125,22 @@ spec:
     app: nginx
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: LoadBalancer
+    port: 80 # Service port
+    targetPort: 80 # Container port
+  type: NodePort # NodePort for AWS ALB ingress target group
 ---
+# Ingress resource with AWS ALB ingress controller annotations
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx-ingress
   namespace: nginx-ns
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: alb # Use AWS ALB Ingress controller
+    alb.ingress.kubernetes.io/scheme: internet-facing # Public ALB
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/target-type: ip # Target pods by IP (recommended)
+    nginx.ingress.kubernetes.io/rewrite-target: / # Rewrite all paths to /
 spec:
   rules:
   - host: nginx.example.com
