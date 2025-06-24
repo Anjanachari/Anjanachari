@@ -8,3 +8,4 @@ Anjana/
 *.tfplan
 .crash
 .terraform.lock.hcl
+Ansible/Anjana/
